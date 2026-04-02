@@ -38,4 +38,4 @@ proposed by Quintana and Guastella (2020)
 
 ## Citing this work
 
-See this project's 'Zenodo' page for the preferred citation.
+Quintana, D. S. (2026). FAIR theory: The Allostatic Theory of Oxytocin (0.1.0). Zenodo. https://doi.org/10.5281/zenodo.19384375
