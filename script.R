@@ -16,3 +16,10 @@ add_zenodo_json_theory(
 worcs::check_git()
 
 gert::git_init(path = project_path)
+usethis::create_github_token()
+
+gitcreds::gitcreds_set()
+
+worcs::git_remote_create("oxytocin_allostatic_theory", private = FALSE)
+
+worcs::git_update("First commit of my theory", repo = project_path)
