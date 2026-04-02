@@ -1,0 +1,112 @@
+// Allostatic Theory of Oxytocin — model DAG
+// Quintana (2026), "A Formal Computational Account of the Allostatic Theory of Oxytocin"
+//
+// Each node is a variable in the model equations.
+// Each edge is a functional dependency.
+// This file is a machine-readable complement to fig-dag in the manuscript.
+//
+// Render with:
+//   dot -Tpng allostatic_dag.dot -o allostatic_dag.png
+//   dot -Tsvg allostatic_dag.dot -o allostatic_dag.svg
+//   dot -Tpdf allostatic_dag.dot -o allostatic_dag.pdf
+
+digraph allostatic_oxt {
+
+  rankdir = LR
+  splines = curved
+  nodesep = 0.5
+  ranksep = 0.8
+
+  node [shape=box, style="filled,rounded", fontname="Helvetica", fontsize=10,
+        width=1.2, height=0.6]
+  edge [fontname="Helvetica", fontsize=8]
+
+  // ── OXT input ──────────────────────────────────────────────────────────────
+  omega [label="Ω\nOXT level", fillcolor="#e8d5f0", color="#9970ab",
+         penwidth=2]
+
+  // ── OXT-dependent parameters ───────────────────────────────────────────────
+  sigma [label="σ(Ω)\nsensing noise",  fillcolor="#d0e8f8", color="#4393c3"]
+  alpha [label="α(Ω)\nlearning rate",  fillcolor="#d0e8f8", color="#4393c3"]
+  w     [label="w(Ω)\nprior weight",   fillcolor="#d0e8f8", color="#4393c3"]
+  gamma [label="γ(Ω)\nresponse gain",  fillcolor="#d0e8f8", color="#4393c3"]
+
+  // ── Environment signals ────────────────────────────────────────────────────
+  // Two distinct environment signals:
+  //   cue = s(t+h): predictive cue, leads true state by h steps → forms ô(t)
+  //   true_env = s(t): current true state → drives y(t) drift and f(t)
+  cue      [label="s(t+h)\npred. cue",   fillcolor="#fce8d0", color="#d6600a"]
+  true_env [label="s(t)\ntrue state",    fillcolor="#fce8d0", color="#d6600a"]
+
+  // ── Computation cascade ────────────────────────────────────────────────────
+  obs  [label="ô(t)\nobservation", fillcolor="#ebebeb", color="#888888"]
+  bel  [label="b(t)\nbelief",      fillcolor="#ebebeb", color="#888888"]
+  pre  [label="p(t)\nprediction",  fillcolor="#ebebeb", color="#888888"]
+  xst  [label="x(t)\nset-point",   fillcolor="#ebebeb", color="#888888"]
+
+  // ── Body state (OXT-independent) ───────────────────────────────────────────
+  ybd  [label="y(t)\nbody state",  fillcolor="#fce8d0", color="#d6600a"]
+
+  // ── Outputs ─────────────────────────────────────────────────────────────────
+  fit  [label="f(t) = 1 − |x(t) − s(t)|\nfitness",
+        fillcolor="#fcd8d4", color="#c0392b", penwidth=2, width=1.8]
+  loa  [label="L(t) = |y(t) − x(t)|\nallostatic load",
+        fillcolor="#fcd8d4", color="#c0392b", penwidth=2, width=1.8]
+  eff  [label="E = mean(f) / mean(L)\nefficiency",
+        fillcolor="#fcd8d4", color="#c0392b", penwidth=2, width=1.8]
+
+  // ── Edges: Ω → parameters ──────────────────────────────────────────────────
+  // Functional form annotated on each arrow.
+  // σ is U-shaped (minimum noise at Ω = 1).
+  // α and γ are inverted-U (maximum at Ω = 1).
+  // w is linear (higher OXT → greater reliance on prior belief).
+  omega -> sigma [label="U-shape",  color="#9970ab", fontcolor="#9970ab"]
+  omega -> alpha [label="∩-shape",  color="#9970ab", fontcolor="#9970ab"]
+  omega -> w     [label="linear",   color="#9970ab", fontcolor="#9970ab"]
+  omega -> gamma [label="∩-shape",  color="#9970ab", fontcolor="#9970ab"]
+
+  // ── Edges: parameters modulate cascade steps (dashed) ──────────────────────
+  // Dashed edges indicate that the parameter governs the step,
+  // not that it provides a data input to it.
+  sigma -> obs  [style=dashed, color="#4393c3"]
+  alpha -> bel  [style=dashed, color="#4393c3"]
+  w     -> pre  [style=dashed, color="#4393c3",
+                 label="weights b vs ô"]
+  gamma -> xst  [style=dashed, color="#4393c3",
+                 label="gain of update"]
+
+  // ── Edges: environment → cascade (data inputs) ─────────────────────────────
+  // s(t+h) is the noisy predictive cue that forms the observation ô(t).
+  cue -> obs  [style=dotted, color="#d6600a", fontcolor="#d6600a",
+               label="+ noise σ(Ω)"]
+
+  // ── Edges: cascade data flow (solid) ───────────────────────────────────────
+  obs -> bel  [color="#555555"]
+  obs -> pre  [color="#555555"]
+  bel -> pre  [color="#555555"]
+  pre -> xst  [color="#555555"]
+
+  // ── Edges: output computation ───────────────────────────────────────────────
+  xst -> fit      [color="#555555"]
+  true_env -> fit [style=dotted, color="#d6600a"]
+  fit  -> eff     [color="#c0392b"]
+  xst  -> loa     [color="#555555"]
+  ybd  -> loa     [color="#d6600a"]
+  loa  -> eff     [color="#c0392b"]
+
+  // ── OXT-independent drift (Assumption A5) ──────────────────────────────────
+  // y(t) drifts toward s(t) at fixed rate δ = 0.15, regardless of Ω.
+  // This is the key structural asymmetry: OXT modulates x(t) but not y(t).
+  true_env -> ybd  [style=dotted, color="#d6600a", fontcolor="#d6600a",
+                    label="OXT-independent\ndrift, rate δ = 0.15"]
+
+  // ── Rank constraints (left-to-right column grouping) ───────────────────────
+  { rank=same; omega }
+  { rank=same; sigma; alpha; w; gamma }
+  { rank=same; cue; true_env }
+  { rank=same; obs; bel }
+  { rank=same; pre }
+  { rank=same; xst; ybd }
+  { rank=same; fit; loa }
+  { rank=same; eff }
+}
