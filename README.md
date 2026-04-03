@@ -29,8 +29,7 @@ By participating in this project, you agree to abide by the [Contributor Covenan
 
 See this project's Zenodo page for cross-references to related work. 
 
-This repository contains an implementation of the "empirical cycle", a model
-proposed by Quintana and Guastella (2020)
+This repository contains an formal implementation of the Allostatic Theory of oxytocin, a theory first proposed verbally by Quintana and Guastella (2020).
 
 > Quintana, D. S., & Guastella, A. J. (202O). An allostatic theory of oxytocin
 > Trends in Cognitive Sciences, 24 (7)
