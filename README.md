@@ -37,4 +37,4 @@ This repository contains an formal implementation of the Allostatic Theory of ox
 
 ## Citing this work
 
-Quintana, D. S. (2026). FAIR theory: The Allostatic Theory of Oxytocin (0.1.0). Zenodo. https://doi.org/10.5281/zenodo.19384375
+Quintana, D. S. (2026). FAIR theory: The Allostatic Theory of Oxytocin (0.2.0). Zenodo. https://doi.org/10.5281/zenodo.19384375
