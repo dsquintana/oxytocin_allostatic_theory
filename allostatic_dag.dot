@@ -17,6 +17,12 @@
  *   dashed : OXT-modulated parameter influence on cascade
  *   dotted : environmental inputs
  *
+ * Timing: the prediction p(t) uses the belief carried over from the
+ * previous step, b(t−1); the observation ô(t) then updates the belief
+ * (at rate α(Ω)) for the next step. The body state y(t) is pulled toward
+ * the true state s(t) at the fixed rate δ and toward the set-point x(t)
+ * at the OXT-dependent rate κ(Ω).
+ *
  * Render with Graphviz:
  *   dot -Tpdf allostatic_dag.dot -o allostatic_dag.pdf
  *   dot -Tpng allostatic_dag.dot -o allostatic_dag.png
@@ -156,8 +162,9 @@ digraph allostatic_theory {
       penwidth  = 1.0
       fontcolor = "#555555"
     ]
+    /* Belief carried over from the previous step; feeds the prediction p(t) */
     bel [
-      label     = "b(t)\nbelief"
+      label     = "b(t−1)\nprior belief"
       fillcolor = "#eeeeee"
       color     = "#555555"
       penwidth  = 1.0
@@ -252,15 +259,19 @@ digraph allostatic_theory {
   /* Predictive cue s(t+h) feeds the noisy observation               */
   cue -> obs [ color = "#d6600a"  style = dotted  penwidth = 1.2 ]
   /* True state s(t) drives passive body-state drift (rate δ = 0.15) */
-  env -> ybd [ color = "#d6600a"  style = dotted  penwidth = 0.9 ]
+  env -> ybd [ color = "#d6600a"  style = dotted  penwidth = 0.9  xlabel = "δ"  fontcolor = "#d6600a" ]
   /* True state s(t) enters fitness calculation                       */
   env -> fit [ color = "#d6600a"  style = dotted  penwidth = 0.9 ]
 
   /* ── Cascade flow (grey, solid) ──────────────────────────────── */
-  obs -> bel [ color = "#555555"  penwidth = 1.2 ]
+  /* The observation updates the belief for the next step */
+  obs -> bel [ color = "#555555"  penwidth = 1.2  xlabel = "update"  fontcolor = "#555555" ]
   obs -> pre [ color = "#555555"  penwidth = 1.2 ]
+  /* The prediction uses the belief from the previous step, b(t−1) */
   bel -> pre [ color = "#555555"  penwidth = 1.2 ]
   pre -> xst [ color = "#555555"  penwidth = 1.2 ]
+  /* The set-point pulls the body state toward it (efferent coupling, rate κ(Ω)) */
+  xst -> ybd [ color = "#555555"  penwidth = 1.2 ]
   xst -> fit [ color = "#555555"  penwidth = 1.2 ]
   xst -> loa [ color = "#555555"  penwidth = 1.2 ]
 
